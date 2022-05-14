@@ -33,3 +33,4 @@ node_modules
 .husky/
 README.md
 __tests__/
+fly.toml
