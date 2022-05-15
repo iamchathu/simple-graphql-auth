@@ -14,9 +14,14 @@ import path from 'path';
 import 'reflect-metadata';
 import { buildSchema } from 'type-graphql';
 import config from './config';
+import { dataSource } from './config/database';
+import authChecker, { extractTokenFromRequest, verifyToken } from './graphql/auth';
+import { Context } from './graphql/context';
 
 const setupServer = async () => {
   const app = express();
+
+  await dataSource.initialize();
 
   const httpServer = http.createServer(app);
   const server = new ApolloServer({
@@ -24,8 +29,24 @@ const setupServer = async () => {
       resolvers: [
         path.resolve(__dirname, `graphql/resolvers/*.${process.env.NODE_ENV !== 'production' ? 'ts' : 'js'}`),
       ],
-      //   authChecker,
+      authChecker,
     }),
+    context: ({ req }): Context => {
+      try {
+        const token = extractTokenFromRequest(req);
+        if (token) {
+          const appUser = verifyToken(token);
+          return {
+            token,
+            appUser,
+          };
+        }
+      } catch (error) {
+        console.error(error);
+      }
+      return {};
+    },
+
     debug: process.env.NODE_DEV !== 'production',
     plugins: [
       ApolloServerPluginDrainHttpServer({ httpServer }),

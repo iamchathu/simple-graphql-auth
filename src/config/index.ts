@@ -5,8 +5,18 @@ const config = {
     port: process.env.PORT ?? 4008,
   },
   auth: {
-    userName: process.env.ADMIN_USERNAME,
-    password: process.env.ADMIN_PASSWORD,
+    issuer: process.env.AUTH_ISSUER ?? 'http://localhost:4004/',
+    audience: process.env.AUTH_AUDIENCE ?? 'http://localhost:3000/',
+    expireTime: process.env.AUTH_EXPIRE_TIME ?? '5m',
+    refreshExpireTime: process.env.AUTH_REFRESH_EXPIRE_TIME ?? '7d',
+    secret: process.env.AUTH_SECRET ?? 'pv5+qIpYkkwezTlxCsmxNx+EoHsMYZU6PSNTMqJVfWtruLx/cw21JRBtBHTiB3Lp96Cs3IXtop',
+  },
+  database: {
+    host: process.env.DATABASE_HOST ?? 'localhost',
+    user: process.env.DATABASE_USER ?? 'root',
+    password: process.env.DATABASE_PASSWORD ?? 'pg123',
+    database: process.env.DATABASE_NAME ?? 'simple-db',
+    port: parseInt(process.env.DATABASE_PORT ?? '5432', 10),
   },
   cors: {
     methods: ['GET', 'POST'],
